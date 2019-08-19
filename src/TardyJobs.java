@@ -14,13 +14,15 @@ public class TardyJobs {
         List<Job> joblist = new CSVReader().getJobs();
         List<Job> sorted = sortByDueDate(joblist);
         List<Job> schedule = new ArrayList<>();
+        int lateJobs = 0;
 
         int iteration = 0;
-        for (Job job : sorted){
+        while (sorted.size()!=0){
             Job toExecute = getNextExecutable(sorted,iteration);
             if (toExecute !=null){
                 //E' STATO SCELTO UN JOB, ESEGUI
-                schedule.add(toExecute);
+                if (schedule.size()==0 || schedule.get(schedule.size()-1).getID() != toExecute.getID())
+                    schedule.add(toExecute);
                 //CONTROLLO CHE IL JOB ABBIA TERMINATO L'ESECUZIONE
                 if (toExecute.getRemainingTime()>1){
                     //IL JOB NON E' ANCORA TERMINATO
@@ -28,6 +30,11 @@ public class TardyJobs {
                 }else {
                     //IL JOB HA TERMINATO L'ESECUZIONE, TOGLILO DALLA LISTA
                     toExecute.setRemainingTime(toExecute.getRemainingTime()-1);
+                    toExecute.setCompleteTime(iteration);
+
+                    //CONTROLLA SE IL JOB E' IN RITARDO
+                    if (toExecute.getCompleteTime()>toExecute.getDueDate())
+                        toExecute.setLate(true);
                     sorted.remove(toExecute);
                 }
                 iteration++;
@@ -36,11 +43,20 @@ public class TardyJobs {
                 iteration++;
             }
         }
+
+        for (Job job : schedule){
+            if (job.isLate())
+                lateJobs++;
+        }
+
+        System.out.println(lateJobs);
+
+        printJoblist(schedule);
     }
 
     private static Job getNextExecutable(List<Job> list,int iteration){
         for (int i=0;i<list.size();++i){
-            if(list.get(i).getReleaseDate()>= iteration){
+            if(list.get(i).getReleaseDate()<= iteration){
                 return list.get(i);
             }
         }
@@ -57,7 +73,8 @@ public class TardyJobs {
     public static void printJoblist(List<Job> list){
         for ( Job job : list){
             System.out.println("ID: "+job.getID() + " PROCESSING TIME: "+ job.getProcessingTime()+ " DUE DATE: "+ job.getDueDate()
-                    +" RELEASE DATE: "+job.getReleaseDate());
+                    +" RELEASE DATE: "+job.getReleaseDate()+" REMAINING TIME: "+job.getRemainingTime()
+                    +" COMPLETE TIME: "+job.getCompleteTime()+" LATE: "+ job.isLate());
         }
     }
 }

@@ -8,7 +8,7 @@ public class Job {
     private int releaseDate;
     private int remainingTime;
     private int completeTime;
-
+    private boolean late = false;
 
     public Job(int ID, int processingTime, int dueDate, int releaseDate) {
         this.ID = ID;
@@ -16,7 +16,16 @@ public class Job {
         this.dueDate = dueDate;
         this.releaseDate = releaseDate;
         this.remainingTime = processingTime;
+    }
 
+    public Job(int ID, int processingTime, int dueDate, int releaseDate, int remainingTime, int completeTime, boolean late) {
+        this.ID = ID;
+        this.processingTime = processingTime;
+        this.dueDate = dueDate;
+        this.releaseDate = releaseDate;
+        this.remainingTime = remainingTime;
+        this.completeTime = completeTime;
+        this.late = late;
     }
 
     public int getID() {
@@ -54,4 +63,12 @@ public class Job {
     public int getCompleteTime() { return completeTime; }
 
     public void setCompleteTime(int completeTime) { this.completeTime = completeTime; }
+
+    public boolean isLate() {
+        return late;
+    }
+
+    public void setLate(boolean late) {
+        this.late = late;
+    }
 }
