@@ -21,8 +21,7 @@ public class TardyJobs {
             Job toExecute = getNextExecutable(sorted,iteration);
             if (toExecute !=null){
                 //E' STATO SCELTO UN JOB, ESEGUI
-                /*if (schedule.size()==0 || schedule.get(schedule.size()-1).getID() != toExecute.getID())
-                    schedule.add(toExecute);*/
+                iteration++;
                 //CONTROLLO CHE IL JOB ABBIA TERMINATO L'ESECUZIONE
                 if (toExecute.getRemainingTime()>1){
                     //IL JOB NON E' ANCORA TERMINATO
@@ -43,7 +42,6 @@ public class TardyJobs {
                     schedule.remove(schedule.get(schedule.size()-1));
                     schedule.add(new Job(toExecute.getID(),toExecute.getProcessingTime(),toExecute.getDueDate(),toExecute.getReleaseDate(),toExecute.getRemainingTime(),toExecute.getCompleteTime(),toExecute.isLate()));
                 }
-                iteration++;
             }else {
                 //NON CI SONO JOB RILASCIATI DA ESEGUIRE, AUMENTA SOLO LE ITERAZIONI
                 iteration++;
@@ -55,7 +53,7 @@ public class TardyJobs {
                 lateJobs++;
         }
 
-        System.out.println(lateJobs);
+        System.out.println("LATE JOBS: "+lateJobs);
 
         printJoblist(schedule);
     }
