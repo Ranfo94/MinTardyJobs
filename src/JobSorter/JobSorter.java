@@ -5,7 +5,8 @@ import Entity.Job;
 import java.util.List;
 
 public class JobSorter {
-    private static List<Job> quickSort(List<Job> list, int lowerIndex, int higherIndex) {
+
+    public List<Job> quickSort(List<Job> list, int lowerIndex, int higherIndex) {
         int i = lowerIndex;
         int j = higherIndex;
         // Calcola il numero pivot, prendendo come pivot il numero centrale
@@ -33,7 +34,7 @@ public class JobSorter {
         return list;
     }
 
-    private static List<Job> switchElement(List<Job> list, int i, int j) {
+    private List<Job> switchElement(List<Job> list, int i, int j) {
         Job temp = list.get(i);
         list.set(i, list.get(j));
         list.set(j, temp);
