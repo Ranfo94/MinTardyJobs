@@ -10,11 +10,13 @@ public class Job {
     private int completeTime;
 
 
-    public Job(int ID, int processingTime, int dueDate, int releaseDate, int remainingTime) {
+    public Job(int ID, int processingTime, int dueDate, int releaseDate) {
         this.ID = ID;
         this.processingTime = processingTime;
         this.dueDate = dueDate;
         this.releaseDate = releaseDate;
+        this.remainingTime = processingTime;
+
     }
 
     public int getID() {

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class FileWriter {
 
-    public static void FileWriter(List<Job> tardyJobs, List<Job> orderedList, long runningTime) throws FileNotFoundException {
+    public static void FileWriter(List<Job> tardyJobs, List<Job> schedule, long runningTime) throws FileNotFoundException {
 
         PrintWriter printWriter = new PrintWriter(new File("Ordered.csv"));
         StringBuilder stringBuilder = new StringBuilder();
@@ -49,8 +49,8 @@ public class FileWriter {
         stringBuilder.append("Ordered DueDate");
         stringBuilder.append('\n');
 
-        for (int i = 0; i < orderedList.size(); i++){
-            Job job = orderedList.get(i);
+        for (int i = 0; i < schedule.size(); i++){
+            Job job = schedule.get(i);
             stringBuilder.append(job.getID());
             stringBuilder.append(';');
             stringBuilder.append(job.getProcessingTime());
