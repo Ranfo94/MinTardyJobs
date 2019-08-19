@@ -7,12 +7,15 @@ public class Job {
     private int dueDate;
     private int releaseDate;
 
-    public int getID() {
-        return ID;
+    public Job(int ID, int processingTime, int dueDate, int releaseDate) {
+        this.ID = ID;
+        this.processingTime = processingTime;
+        this.dueDate = dueDate;
+        this.releaseDate = releaseDate;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public int getID() {
+        return ID;
     }
 
     public int getProcessingTime() {
