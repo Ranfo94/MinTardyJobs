@@ -6,8 +6,11 @@ public class Job {
     private int processingTime;
     private int dueDate;
     private int releaseDate;
+    private int remainingTime;
+    private int completeTime;
 
-    public Job(int ID, int processingTime, int dueDate, int releaseDate) {
+
+    public Job(int ID, int processingTime, int dueDate, int releaseDate, int remainingTime) {
         this.ID = ID;
         this.processingTime = processingTime;
         this.dueDate = dueDate;
@@ -41,4 +44,12 @@ public class Job {
     public void setReleaseDate(int releaseDate) {
         this.releaseDate = releaseDate;
     }
+
+    public int getRemainingTime() {return remainingTime; }
+
+    public void setRemainingTime(int remainingTime) {this.remainingTime = remainingTime;}
+
+    public int getCompleteTime() { return completeTime; }
+
+    public void setCompleteTime(int completeTime) { this.completeTime = completeTime; }
 }
