@@ -1,5 +1,6 @@
 import Entity.Job;
 import FileReader.CSVReader;
+import FileWriter.FileWriter;
 import JobSorter.JobSorter;
 
 import java.io.FileNotFoundException;
@@ -9,6 +10,8 @@ import java.util.List;
 public class TardyJobs {
 
     public static void main(String[] args) throws FileNotFoundException {
+
+        long startTime = System.currentTimeMillis();
 
         //PRENDO LA LISTA DI JOB DAL FILE CSV E ORDINO IN BASE ALLA DUE DATE
         List<Job> joblist = new CSVReader().getJobs();
@@ -55,7 +58,13 @@ public class TardyJobs {
 
         System.out.println("LATE JOBS: "+lateJobs);
 
+        long endTime = System.currentTimeMillis();
+
         printJoblist(schedule);
+
+
+        FileWriter fileWriter = new FileWriter();
+        fileWriter.FileWriter(lateJobs, schedule, endTime - startTime);
     }
 
     private static Job getNextExecutable(List<Job> list,int iteration){
