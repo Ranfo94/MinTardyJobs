@@ -9,6 +9,7 @@ public class Job {
     private int remainingTime;
     private int completeTime;
     private boolean late = false;
+    private boolean isMovable = false;
 
     public Job(int ID, int processingTime, int dueDate, int releaseDate) {
         this.ID = ID;
@@ -70,5 +71,13 @@ public class Job {
 
     public void setLate(boolean late) {
         this.late = late;
+    }
+
+    public boolean isMovable() {
+        return isMovable;
+    }
+
+    public void setMovable(boolean movable) {
+        isMovable = movable;
     }
 }
