@@ -10,9 +10,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TardyJobs {
 
-    private static int max_iterations = 40; //numero di iterazioni massime
-    private static int num_movable = 2; //numero di job movable massimi
-    private static int max_size_tardy = 3; //numero ottimo di tardy jobs
+    private static int max_iterations = 3000; //numero di iterazioni massime
+    private static int num_movable = 4; //numero di job movable massimi
+    private static int max_size_tardy = 10; //numero ottimo di tardy jobs
     private static List<Job> tardy_jobs;
     private static List<Job> schedule;
     private static int time = 0;
@@ -44,9 +44,10 @@ public class TardyJobs {
 
             if (compute_schedule(sorted_mov_list,um_list)){
                 //controlla se la schedule trova è ammissibile
-                for (Job job : tardy_jobs){
+                /*for (Job job : tardy_jobs){
                     lateJobs++;
-                }
+                }*/
+                lateJobs = tardy_jobs.size();
                 if (max_size_tardy >= lateJobs){
                     //ho trovato una schedula ammissibile
 
@@ -57,7 +58,7 @@ public class TardyJobs {
                     System.out.println("********** printing tardy jobs **********");
                     printJoblist(tardy_jobs);
                     FileWriter fileWriter = new FileWriter();
-                    fileWriter.FileWriter(lateJobs, schedule, endTime - startTime);
+                    fileWriter.FileWriter(lateJobs, schedule, endTime - startTime,tardy_jobs);
                     return;
                 }
 
@@ -120,26 +121,64 @@ public class TardyJobs {
     private static void printJoblist(List<Job> list){
         for ( Job job : list){
             System.out.println("ID: "+job.getID() + " PROCESSING TIME: "+ job.getProcessingTime()+ " DUE DATE: "+ job.getDueDate()
-                    +" RELEASE DATE: "+job.getReleaseDate()+" REMAINING TIME: "+job.getRemainingTime()
-                    +" COMPLETE TIME: "+job.getCompleteTime()+" LATE: "+ job.isLate());
+                    +" RELEASE DATE: "+job.getReleaseDate()
+                    +" COMPLETE TIME: "+job.getCompleteTime()
+                    +" COUNTER: "+job.getCounter());
         }
     }
 
     private static List<Job> createMovableList(List<Job> list){
         List<Job> movable_list = new ArrayList<Job>();
-        int i = num_movable;
-        while (i>0){
-            // genera un numero random (job_index) tra 0 e la size della lista
-            //originale-1 che rappresenta l'indice del job da rendere movable
-            int job_index = ThreadLocalRandom.current().nextInt(0 , list.size()-1);
-            Job job = list.get(job_index);
-            if (!movable_list.contains(job)){
-                job.setMovable(true);
-                movable_list.add(job);
-                --i;
+        int nmov = num_movable;
+        Long minValue= 0L;
+        while (nmov>0) {
+            minValue = discoverMinUsage(list);
+            List<Job> minList = new ArrayList<>();
+            for (Job j : list) {
+                if (j.getCounter().equals(minValue))
+                    minList.add(j);
+            }
+            if (minList.size() > nmov) {
+                while (nmov>0) {
+                    int job_index = ThreadLocalRandom.current().nextInt(0, minList.size() - 1);
+                    Job job = minList.get(job_index);
+                    if (!movable_list.contains(job)) {
+                        job.setMovable(true);
+                        job.advanceCounter();
+                        movable_list.add(job);
+                        --nmov;
+                    }
+                }
+                return movable_list;
+            } else {
+                for (Job j : minList) {
+                    j.advanceCounter();
+                    j.setMovable(true);
+                    movable_list.add(j);
+                    --nmov;
+                }
             }
         }
+        /*while (nmov>0){
+            int job_index = ThreadLocalRandom.current().nextInt(0, list.size() - 1);
+            Job job = list.get(job_index);
+            if (!movable_list.contains(job)) {
+                job.setMovable(true);
+                job.advanceCounter();
+                movable_list.add(job);
+                --nmov;
+            }
+        }*/
         return movable_list;
+    }
+
+    private static Long discoverMinUsage(List<Job> jobList){
+        Long min = jobList.get(0).getCounter();
+        for (Job job: jobList){
+            if (job.getCounter()<min)
+                min = job.getCounter();
+        }
+        return min;
     }
 
     private static List<Job> createUnmovableList(List<Job> list){

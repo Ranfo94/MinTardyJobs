@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CSVReader {
 
-    private String filename = "dataset/jobs.csv";
+    private String filename = "dataset/10jobs.csv";
 
     public List<Job> getJobs() throws FileNotFoundException {
 

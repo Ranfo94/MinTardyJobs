@@ -6,17 +6,15 @@ public class Job {
     private int processingTime;
     private int dueDate;
     private int releaseDate;
-    private int remainingTime;
     private int completeTime;
-    private boolean late = false;
     private boolean isMovable = false;
+    private Long counter = 0L;
 
     public Job(int ID, int processingTime, int dueDate, int releaseDate) {
         this.ID = ID;
         this.processingTime = processingTime;
         this.dueDate = dueDate;
         this.releaseDate = releaseDate;
-        this.remainingTime = processingTime;
     }
 
     public Job(int ID, int processingTime, int dueDate, int releaseDate, int remainingTime, int completeTime, boolean late) {
@@ -24,9 +22,7 @@ public class Job {
         this.processingTime = processingTime;
         this.dueDate = dueDate;
         this.releaseDate = releaseDate;
-        this.remainingTime = remainingTime;
         this.completeTime = completeTime;
-        this.late = late;
     }
 
     public int getID() {
@@ -57,21 +53,9 @@ public class Job {
         this.releaseDate = releaseDate;
     }
 
-    public int getRemainingTime() {return remainingTime; }
-
-    public void setRemainingTime(int remainingTime) {this.remainingTime = remainingTime;}
-
     public int getCompleteTime() { return completeTime; }
 
     public void setCompleteTime(int completeTime) { this.completeTime = completeTime; }
-
-    public boolean isLate() {
-        return late;
-    }
-
-    public void setLate(boolean late) {
-        this.late = late;
-    }
 
     public boolean isMovable() {
         return isMovable;
@@ -79,5 +63,17 @@ public class Job {
 
     public void setMovable(boolean movable) {
         isMovable = movable;
+    }
+
+    public Long getCounter() {
+        return counter;
+    }
+
+    public void setCounter(Long counter) {
+        this.counter = counter;
+    }
+
+    public void advanceCounter(){
+        this.counter+=1;
     }
 }
