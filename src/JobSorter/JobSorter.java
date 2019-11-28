@@ -34,6 +34,36 @@ public class JobSorter {
         return list;
     }
 
+    /*QUICKSORT CON PROCESSING TIME*/
+    /*public List<Job> quickSort(List<Job> list, int lowerIndex, int higherIndex) {
+        int i = lowerIndex;
+        int j = higherIndex;
+        // Calcola il numero pivot, prendendo come pivot il numero centrale
+        Job pivot_job = list.get(lowerIndex + (higherIndex - lowerIndex) / 2);
+        int pivot = pivot_job.getProcessingTime();
+        // Divide in due array
+        while (i <= j) {
+            while (list.get(i).getProcessingTime() < pivot) {
+                i++;
+            }
+            while (list.get(j).getProcessingTime() > pivot) {
+                j--;
+            }
+            if (i <= j) {
+                list = switchElement(list, i, j);
+                i++;
+                j--;
+            }
+        }
+        // Chiama quickSort() in modo ricorsivo
+        if (lowerIndex < j)
+            quickSort(list, lowerIndex, j);
+        if (i < higherIndex)
+            quickSort(list, i, higherIndex);
+        return list;
+    }*/
+
+
     private List<Job> switchElement(List<Job> list, int i, int j) {
         Job temp = list.get(i);
         list.set(i, list.get(j));

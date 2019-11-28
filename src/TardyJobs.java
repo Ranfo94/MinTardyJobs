@@ -10,9 +10,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TardyJobs {
 
-    private static int max_iterations = 3000; //numero di iterazioni massime
-    private static int num_movable = 4; //numero di job movable massimi
-    private static int max_size_tardy = 10; //numero ottimo di tardy jobs
+    private static int max_iterations = 30000; //numero di iterazioni massime
+    private static int num_movable = 15; //numero di job movable massimi
+    private static int max_size_tardy = 8; //numero ottimo di tardy jobs
     private static List<Job> tardy_jobs;
     private static List<Job> schedule;
     private static int time = 0;
@@ -35,7 +35,9 @@ public class TardyJobs {
             //controlla la prima schedula
             List<Job> m_list = createMovableList(joblist);
             List<Job> um_list = createUnmovableList(joblist);
-            List<Job> sorted_mov_list = sortByDueDate(m_list);
+            //List<Job> sorted_mov_list = sortByDueDate(m_list);
+            List<Job> sorted_mov_list = sortByProcessingTime(m_list);
+
 
             System.out.println("********** printing mov list **********");
             printJoblist(m_list);
@@ -97,21 +99,36 @@ public class TardyJobs {
         }
         for (int j=0;j<sorted_mov_list.size();j++){
             Job job = sorted_mov_list.get(j);
-            if (!schedule.contains(job)){
-                //esegui
-                time += job.getProcessingTime(); //avanzo il tempo
-                if (time>job.getDueDate()){
-                    //il job è in ritardo
-                    //job.setLate(true);
-                    tardy_jobs.add(job);
+            if (job.getReleaseDate()>time){
+                //il job non è ancora stato rilasciato --> trova un movable rilasciato
+                if (!search_for_executable_movable(sorted_mov_list)){
+                    //non c'è un job eseguibile
+                    return false;
                 }
-                schedule.add(job);
+            }else{
+                if (!schedule.contains(job)){
+                    //esegui
+                    time += job.getProcessingTime(); //avanzo il tempo
+                    if (time>job.getDueDate()){
+                        //il job è in ritardo
+                        //job.setLate(true);
+                        tardy_jobs.add(job);
+                    }
+                    schedule.add(job);
+                }
             }
         }
         return true;
     }
 
-    private static List<Job> sortByDueDate(List<Job> ns_list){
+    /*private static List<Job> sortByDueDate(List<Job> ns_list){
+        List<Job> s_list = new ArrayList<Job>();
+        int list_len = ns_list.size();
+        s_list = new JobSorter().quickSort(ns_list,0,list_len-1);
+        return s_list;
+    }*/
+
+    private static List<Job> sortByProcessingTime(List<Job> ns_list){
         List<Job> s_list = new ArrayList<Job>();
         int list_len = ns_list.size();
         s_list = new JobSorter().quickSort(ns_list,0,list_len-1);
@@ -195,11 +212,17 @@ public class TardyJobs {
         for (int i=0;i<jobList.size();i++){
             Job m_job = jobList.get(i);
             if (m_job.getReleaseDate()<=time && !schedule.contains(m_job)){
+                //cerca un altro job con stessa due date ma processing time minore
+                for (int j=0;j<jobList.size();j++){
+                    Job j2 = jobList.get(j);
+                    if ((j2.getProcessingTime()<m_job.getProcessingTime()) && (j2.getDueDate()==m_job.getDueDate()))
+                        if (j2.getReleaseDate()<=time && !schedule.contains(j2))
+                            m_job = j2;
+                }
                 //processo subito il job
                 time+=m_job.getProcessingTime();
                 if (time>m_job.getDueDate()){
-                    //il job è in ritardo
-                    //m_job.setLate(true);
+                    //il job è in ritardod
                     tardy_jobs.add(m_job);
                 }
                 schedule.add(m_job);
