@@ -10,7 +10,8 @@ import java.util.List;
 
 public class CSVReader {
 
-    private String filename = "dataset/jobs15.csv";
+    //nome del file di input
+    private String filename = "dataset/jobs7.csv";
 
     public List<Job> getJobs() throws FileNotFoundException {
 
@@ -46,8 +47,5 @@ public class CSVReader {
             }
         }
         return jobs;
-
     }
-
-
 }

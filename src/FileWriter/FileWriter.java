@@ -9,6 +9,15 @@ import java.util.List;
 
 public class FileWriter {
 
+    /*
+    * Scrive su un file CSV una lista di job.
+    *
+    * @param numTardyJobs: numero di jobs in ritardo
+    * @param schedule: lista di job rappresentante la schedula
+    * @param runningTime: tempo di esecuzione impiegato a computare la schedula
+    * @param lateList: lista di job in ritardo
+    *
+    * */
     public static void FileWriter(int numTardyJobs, List<Job> schedule, long runningTime, List<Job> lateList) throws FileNotFoundException {
 
         PrintWriter printWriter = new PrintWriter(new File("output/out.csv"));

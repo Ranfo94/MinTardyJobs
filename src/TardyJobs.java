@@ -10,55 +10,47 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TardyJobs {
 
-    private static int max_iterations = 30000; //numero di iterazioni massime
-    private static int num_movable = 15; //numero di job movable massimi
-    private static int max_size_tardy = 8; //numero ottimo di tardy jobs
-    private static List<Job> tardy_jobs;
-    private static List<Job> schedule;
+    private static int max_iterations = 10000; //Numero di iterazioni massime
+    private static int num_movable = 2; //Numero di job movable massimi
+    private static int max_size_tardy = 3; //Numero massimo di tardy jobs
+    private static List<Job> tardy_jobs; //Lista dei jobs in ritardo
+    private static List<Job> schedule; //Schedule finale
     private static int time = 0;
 
     public static void main(String[] args) throws FileNotFoundException {
 
         long startTime = System.currentTimeMillis();
 
-        //PRENDO LA LISTA DI JOB DAL FILE CSV E ORDINO IN BASE ALLA DUE DATE
+        //Creazione di una lista di job a partire dal file CSV di input
         List<Job> joblist = new CSVReader().getJobs();
 
-
-        int iteration = 0;
+        int iteration = 0; //iterazione corrente
         while (iteration<max_iterations){
             System.out.println("Starting iteration n°"+iteration);
             int lateJobs = 0;
             schedule = new ArrayList<>();
             tardy_jobs = new ArrayList<>();
 
-            //controlla la prima schedula
+            //Crea la lista dei movable jobs
             List<Job> m_list = createMovableList(joblist);
+            //Crea la lista degli unmovable jobs
             List<Job> um_list = createUnmovableList(joblist);
-            //List<Job> sorted_mov_list = sortByDueDate(m_list);
-            List<Job> sorted_mov_list = sortByProcessingTime(m_list);
+            //Ordina i movable jobs in base alla Due Date
+            List<Job> sorted_mov_list = sortByDueDate(m_list);
 
-
-            System.out.println("********** printing mov list **********");
-            printJoblist(m_list);
-            System.out.println("********** printing unmov list **********");
-            printJoblist(um_list);
-
+            //Effettua la computazione sulle liste appena create
             if (compute_schedule(sorted_mov_list,um_list)){
-                //controlla se la schedule trova è ammissibile
-                /*for (Job job : tardy_jobs){
-                    lateJobs++;
-                }*/
+                //controlla se la schedule trovata è ammissibile
                 lateJobs = tardy_jobs.size();
                 if (max_size_tardy >= lateJobs){
                     //ho trovato una schedula ammissibile
-
                     long endTime = System.currentTimeMillis();
                     System.out.println("********** printing schedule **********");
                     printJoblist(schedule);
                     System.out.println("i tardy jobs sono: " + lateJobs);
                     System.out.println("********** printing tardy jobs **********");
                     printJoblist(tardy_jobs);
+                    //scrivi il risultato su un file CSV
                     FileWriter fileWriter = new FileWriter();
                     fileWriter.FileWriter(lateJobs, schedule, endTime - startTime,tardy_jobs);
                     return;
@@ -77,21 +69,31 @@ public class TardyJobs {
     }
 
 
+    /*
+    * Esegue la computazione sulle liste di jobs create.
+    * Si cerca di eseguire prima i job della unmovable list. Se il job che deve essere eseguito non è stato rilasciato, allora si cerca un
+    * movable job che possa eseguire prima di lui. Se non ci sono job che possono essere eseguiti allora la schedula viene considerata come
+    * 'non fattibile' e viene restituito il valore false.
+    *
+    * @param sorted_mov_list: lista di movable jobs ordinata per due date;
+    * @param um_list: lista di unmovable jobs;
+    * @out: true se la computazione è valida, altrimenti false
+    * */
     private static boolean compute_schedule(List<Job> sorted_mov_list,List<Job> um_list){
         for (int index =0;index<um_list.size();){
             Job um_job = um_list.get(index);
             if(um_job.getReleaseDate()<=time){
-                //il job è stato rilasciato --> esegui
+                //il job è stato rilasciato
                 time += um_job.getProcessingTime(); //avanzo il tempo
                 if (time>um_job.getDueDate()){
                     //il job è in ritardo
                     tardy_jobs.add(um_job);
-                    //um_job.setLate(true);
                 }
+                //aggiungo il job alla schedule
                 schedule.add(um_job);
                 index++;
             }else {
-                //il job non è eseguibile --> provo ad eseguire un movable job
+                //il job non è eseguibile. Provo allora ad eseguire un movable job
                 if (!search_for_executable_movable(sorted_mov_list)){
                     return false;
                 }
@@ -111,7 +113,6 @@ public class TardyJobs {
                     time += job.getProcessingTime(); //avanzo il tempo
                     if (time>job.getDueDate()){
                         //il job è in ritardo
-                        //job.setLate(true);
                         tardy_jobs.add(job);
                     }
                     schedule.add(job);
@@ -121,29 +122,26 @@ public class TardyJobs {
         return true;
     }
 
-    /*private static List<Job> sortByDueDate(List<Job> ns_list){
-        List<Job> s_list = new ArrayList<Job>();
-        int list_len = ns_list.size();
-        s_list = new JobSorter().quickSort(ns_list,0,list_len-1);
-        return s_list;
-    }*/
-
-    private static List<Job> sortByProcessingTime(List<Job> ns_list){
+    /*
+    * Ordina una lista di jobs in base al valore della due date dei job. Per eseguire l'ordinamento viene applicato l'algoritmo di Quicksort.
+    *
+    * @param ns_list: lista non ordinata di jobs
+    * @out: lista di jobs ordinata in base alle due date dei jobs
+    * */
+    private static List<Job> sortByDueDate(List<Job> ns_list){
         List<Job> s_list = new ArrayList<Job>();
         int list_len = ns_list.size();
         s_list = new JobSorter().quickSort(ns_list,0,list_len-1);
         return s_list;
     }
 
-    private static void printJoblist(List<Job> list){
-        for ( Job job : list){
-            System.out.println("ID: "+job.getID() + " PROCESSING TIME: "+ job.getProcessingTime()+ " DUE DATE: "+ job.getDueDate()
-                    +" RELEASE DATE: "+job.getReleaseDate()
-                    +" COMPLETE TIME: "+job.getCompleteTime()
-                    +" COUNTER: "+job.getCounter());
-        }
-    }
-
+    /*
+    * Crea una lista di Jobs movable a partire dalla lista di tutti i jobs. Utilizza un algoritmo pseudo casuale che tiene conto del numero di
+    * occorrenze dei jobs nelle schedule precedenti.
+    *
+    * @param list: lista dei job totali
+    * @out: lista dei movable jobs
+    * */
     private static List<Job> createMovableList(List<Job> list){
         List<Job> movable_list = new ArrayList<Job>();
         int nmov = num_movable;
@@ -176,17 +174,23 @@ public class TardyJobs {
                 }
             }
         }
-        /*while (nmov>0){
-            int job_index = ThreadLocalRandom.current().nextInt(0, list.size() - 1);
-            Job job = list.get(job_index);
-            if (!movable_list.contains(job)) {
-                job.setMovable(true);
-                job.advanceCounter();
-                movable_list.add(job);
-                --nmov;
-            }
-        }*/
         return movable_list;
+    }
+
+    /*
+    * Crea una lista di jobs unmovable a partire dalla lista di tutti i jobs.
+    *
+    * @param list: lista dei job totali;
+    * @out: lista di jobs unmovable.
+    * */
+    private static List<Job> createUnmovableList(List<Job> list){
+        List<Job> unmovable_list = new ArrayList<>();
+        for(int i=0;i<list.size();i++) {
+            if(!list.get(i).isMovable()) {
+                unmovable_list.add(list.get(i));
+            }
+        }
+        return unmovable_list;
     }
 
     private static Long discoverMinUsage(List<Job> jobList){
@@ -198,33 +202,23 @@ public class TardyJobs {
         return min;
     }
 
-    private static List<Job> createUnmovableList(List<Job> list){
-        List<Job> unmovable_list = new ArrayList<>();
-        for(int i=0;i<list.size();i++) {
-            if(!list.get(i).isMovable()) {
-                unmovable_list.add(list.get(i));
-            }
-        }
-        return unmovable_list;
-    }
-
+    /*
+    * Cerca all'interno della lista dei movable jobs un job che possa essere immediatamente eseguito.
+    *
+    * @param jobList: lista dei movable jobs;
+    * @out: se esista un job che possa essere eseguito subito restituisce true, altrimenti false
+    * */
     private static boolean search_for_executable_movable(List<Job> jobList){
         for (int i=0;i<jobList.size();i++){
             Job m_job = jobList.get(i);
             if (m_job.getReleaseDate()<=time && !schedule.contains(m_job)){
-                //cerca un altro job con stessa due date ma processing time minore
-                for (int j=0;j<jobList.size();j++){
-                    Job j2 = jobList.get(j);
-                    if ((j2.getProcessingTime()<m_job.getProcessingTime()) && (j2.getDueDate()==m_job.getDueDate()))
-                        if (j2.getReleaseDate()<=time && !schedule.contains(j2))
-                            m_job = j2;
-                }
                 //processo subito il job
                 time+=m_job.getProcessingTime();
                 if (time>m_job.getDueDate()){
-                    //il job è in ritardod
+                    //il job è in ritardo
                     tardy_jobs.add(m_job);
                 }
+                //aggiungo il job alla lista
                 schedule.add(m_job);
                 return true;
             }
@@ -233,71 +227,18 @@ public class TardyJobs {
     }
 
     /*
-    public static List<Job> insertByDueDate (List<Job> movable_list , List<Job> unmovable_list){
-        List<Job> list = new ArrayList<Job>();
-        list = unmovable_list;
-        //itero per tutti i jobs nella movable list
-        for (int i=0;i<movable_list.size();i++){
-            int proc_time = 0;
-            int s = movable_list.get(i).getDueDate() - movable_list.get(i).getProcessingTime();
-            //itero per tutti i job della unmovable list
-            for (int j = 0; j<list.size();j++){
-                if (j==list.size()-1){
-                    list.add(j+1,movable_list.get(i));
-                    List<Job> newTardy = createTardyList(unmovable_list);
-                    if (newTardy.size() > tardy_jobs.size()){ //nuovo job in ritardo
-                        tardy_jobs = newTardy; //aggiorno la lista dei jobs in ritardo
-                        Job end_list = getMovJobWithHigherProcTime (unmovable_list);
-                        list.remove(end_list);
-                        list.add(list.size(),end_list);
-                    }
-                    break;
-                }
-                proc_time += list.get(j).getProcessingTime();
-                int next_proc_time = list.get(j+1).getProcessingTime();
-                int proc_time_sum = proc_time + next_proc_time;
-                if (proc_time_sum> s){
-                    list.add(j+1,movable_list.get(i));
-                    List<Job> newTardy = createTardyList(unmovable_list);
-                    if (newTardy.size() > tardy_jobs.size()){ //nuovo job in ritardo
-                        tardy_jobs = newTardy; //aggiorno la lista dei jobs in ritardo
-                        Job end_list = getMovJobWithHigherProcTime (unmovable_list);
-                        list.remove(end_list);
-                        list.add(list.size(),end_list);
-                    }
-                    break;
-                }
-            }
+    * Stampa a schermo una lista di jobs
+    *
+    * @param list: lista dei job da stampare
+    * */
+    private static void printJoblist(List<Job> list){
+        for ( Job job : list){
+            System.out.println("ID: "+job.getID() + " PROCESSING TIME: "+ job.getProcessingTime()+ " DUE DATE: "+ job.getDueDate()
+                    +" RELEASE DATE: "+job.getReleaseDate()
+                    +" COMPLETE TIME: "+job.getCompleteTime()
+                    +" COUNTER: "+job.getCounter());
         }
-        return list;
     }
-
-    private static List<Job> createTardyList(List<Job> unmovable_list){
-        List<Job> tardy_list = new ArrayList<Job>();
-        int proc_time = 0;
-        for (int i = 0;i<unmovable_list.size();i++){
-            proc_time += unmovable_list.get(i).getProcessingTime();
-            if (proc_time > unmovable_list.get(i).getDueDate()){
-                //job i in ritardo
-                tardy_list.add(unmovable_list.get(i));
-            }
-        }
-        return tardy_list;
-    }
-    private static Job getMovJobWithHigherProcTime(List<Job> unmovable_list){
-        Job max_job = null;
-        int max_proc_time =0;
-        for (int i=0;i<unmovable_list.size();++i){
-            Job job = unmovable_list.get(i);
-            if (job.isMovable()){
-                if (job.getProcessingTime() > max_proc_time){
-                    max_proc_time = job.getProcessingTime();
-                    max_job = job;
-                }
-            }
-        }
-        return max_job;
-    }*/
 
 }
 
