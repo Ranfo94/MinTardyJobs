@@ -10,9 +10,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TardyJobs {
 
-    private static int max_iterations = 10000; //Numero di iterazioni massime
-    private static int num_movable = 3; //Numero di job movable massimi
-    private static int max_size_tardy = 8; //Numero massimo di tardy jobs
+    private static int max_iterations = 500000; //Numero di iterazioni massime
+    private static int num_movable = 4; //Numero di job movable massimi
+    private static int max_size_tardy = 12; //Numero massimo di tardy jobs
     private static List<Job> tardy_jobs; //Lista dei jobs in ritardo
     private static List<Job> schedule; //Schedule finale
     private static int time = 0;
