@@ -163,7 +163,7 @@ public class TardyJobs {
             }
             if (minList.size() > nmov) {
                 while (nmov>0) {
-                    int job_index = ThreadLocalRandom.current().nextInt(0, minList.size() - 1);
+                    int job_index = ThreadLocalRandom.current().nextInt(0, minList.size());
                     Job job = minList.get(job_index);
                     if (!movable_list.contains(job)) {
                         job.setMovable(true);
