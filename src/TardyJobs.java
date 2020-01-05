@@ -10,9 +10,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TardyJobs {
 
-    private static int max_iterations = 500000; //Numero di iterazioni massime
-    private static int num_movable = 4; //Numero di job movable massimi
-    private static int max_size_tardy = 12; //Numero massimo di tardy jobs
+    private static int max_iterations = Configuration.max_iterations; //Numero di iterazioni massime
+    private static int num_movable = Configuration.num_movable; //Numero di job movable massimi
+    private static int max_size_tardy = Configuration.max_size_tardy; //Numero massimo di tardy jobs
+    private static String filename = Configuration.filename;
     private static List<Job> tardy_jobs; //Lista dei jobs in ritardo
     private static List<Job> schedule; //Schedule finale
     private static int time = 0;
@@ -22,7 +23,7 @@ public class TardyJobs {
         long startTime = System.currentTimeMillis();
 
         //Creazione di una lista di job a partire dal file CSV di input
-        List<Job> joblist = new CSVReader().getJobs();
+        List<Job> joblist = new CSVReader().getJobs(filename);
 
         int iteration = 0; //iterazione corrente
         while (iteration<max_iterations){
@@ -55,14 +56,10 @@ public class TardyJobs {
                     fileWriter.FileWriter(lateJobs, schedule, endTime - startTime,tardy_jobs);
                     return;
                 }
-
             }
-
             for (Job job : joblist){
                 job.setMovable(false);
             }
-            System.out.println("****** printing late jobs*******");
-            printJoblist(tardy_jobs);
             time=0;
             iteration++;
         }
@@ -115,8 +112,9 @@ public class TardyJobs {
                     if (isJobLate(job) && !delayed_movable.contains(job)){
                         //manda il job in fondo alla lista dei movable e passa al successivo
                         sorted_mov_list.remove(job);
-                        sorted_mov_list.add(sorted_mov_list.size(),job);
+                        sorted_mov_list.add(job);
                         delayed_movable.add(job);
+                        j--;
                     }else{
                         //esegui
                         time += job.getProcessingTime(); //avanzo il tempo
@@ -160,7 +158,7 @@ public class TardyJobs {
             minValue = discoverMinUsage(list);
             List<Job> minList = new ArrayList<>();
             for (Job j : list) {
-                if (j.getCounter().equals(minValue))
+                if (j.getCounter()<= minValue+10)
                     minList.add(j);
             }
             if (minList.size() > nmov) {

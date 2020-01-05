@@ -8,22 +8,15 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CSVReader {
-
-    //nome del file di input
-    private String filename = "dataset/jobs20.csv";
-
-    public List<Job> getJobs() throws FileNotFoundException {
-
+    public List<Job> getJobs(String filename) throws FileNotFoundException {
         List<Job> jobs = new ArrayList<>();
-
         List<Integer> list_opt = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(filename));
         try {
-
             //Salto la prima riga perché non contiene dati
             reader.readLine();
-
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(";");
