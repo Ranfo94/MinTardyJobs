@@ -11,7 +11,7 @@ import java.util.List;
 public class CSVReader {
 
     //nome del file di input
-    private String filename = "dataset/jobs7.csv";
+    private String filename = "dataset/jobs15.csv";
 
     public List<Job> getJobs() throws FileNotFoundException {
 

@@ -11,8 +11,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class TardyJobs {
 
     private static int max_iterations = 10000; //Numero di iterazioni massime
-    private static int num_movable = 2; //Numero di job movable massimi
-    private static int max_size_tardy = 3; //Numero massimo di tardy jobs
+    private static int num_movable = 3; //Numero di job movable massimi
+    private static int max_size_tardy = 8; //Numero massimo di tardy jobs
     private static List<Job> tardy_jobs; //Lista dei jobs in ritardo
     private static List<Job> schedule; //Schedule finale
     private static int time = 0;
@@ -80,6 +80,7 @@ public class TardyJobs {
     * @out: true se la computazione è valida, altrimenti false
     * */
     private static boolean compute_schedule(List<Job> sorted_mov_list,List<Job> um_list){
+        List<Job> delayed_movable = new ArrayList<>();
         for (int index =0;index<um_list.size();){
             Job um_job = um_list.get(index);
             if(um_job.getReleaseDate()<=time){
@@ -108,14 +109,23 @@ public class TardyJobs {
                     return false;
                 }
             }else{
+                //il job è stato rilasciato
                 if (!schedule.contains(job)){
-                    //esegui
-                    time += job.getProcessingTime(); //avanzo il tempo
-                    if (time>job.getDueDate()){
-                        //il job è in ritardo
-                        tardy_jobs.add(job);
+                    //se il job è in ritardo lo mando in fondo alla lista dei movable per non ritardare anche i successivi
+                    if (isJobLate(job) && !delayed_movable.contains(job)){
+                        //manda il job in fondo alla lista dei movable e passa al successivo
+                        sorted_mov_list.remove(job);
+                        sorted_mov_list.add(sorted_mov_list.size(),job);
+                        delayed_movable.add(job);
+                    }else{
+                        //esegui
+                        time += job.getProcessingTime(); //avanzo il tempo
+                        if (time>job.getDueDate()){
+                            //il job è in ritardo
+                            tardy_jobs.add(job);
+                        }
+                        schedule.add(job);
                     }
-                    schedule.add(job);
                 }
             }
         }
@@ -238,6 +248,19 @@ public class TardyJobs {
                     +" COMPLETE TIME: "+job.getCompleteTime()
                     +" COUNTER: "+job.getCounter());
         }
+    }
+
+    /*
+    * Semplice metodo che controlla se un job sarà in ritardo dopo la sua esecuzione.
+    *
+    * @param job: il job da controllare
+    * @out: true se il job sarà in ritardo dopo l'esecuzione
+    * */
+    private static boolean isJobLate(Job job){
+        if (time+job.getProcessingTime()>job.getDueDate()){
+            return true;
+        }
+        return false;
     }
 
 }
