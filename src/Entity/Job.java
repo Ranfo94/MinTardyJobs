@@ -1,15 +1,23 @@
 package Entity;
 
+/*
+* Questa classe descrive come viene rappresentato un job all'interno del sistema ed implementa dei metodi per gestire e manipolare
+* un generico job
+*
+* */
+
 public class Job {
 
-    private int ID;
-    private int processingTime;
-    private int dueDate;
-    private int releaseDate;
-    private int completeTime;
-    private boolean isMovable = false;
+    private int ID; //identifictore univoco
+    private int processingTime; //tempo di processamento
+    private int dueDate; //due date
+    private int releaseDate; //tempo di rilascio
+    private int completeTime; //tempo di completamento
+    private boolean isMovable = false; //specifica se il job è movable
+    //conta il numero di volte che un job è stato scelto come movable. Questo counter viene utilizzato per il criterio di scelta pseudocasuale
     private Long counter = 0L;
 
+    /*Costuttore della classe Job*/
     public Job(int ID, int processingTime, int dueDate, int releaseDate) {
         this.ID = ID;
         this.processingTime = processingTime;
@@ -17,14 +25,7 @@ public class Job {
         this.releaseDate = releaseDate;
     }
 
-    public Job(int ID, int processingTime, int dueDate, int releaseDate, int remainingTime, int completeTime, boolean late) {
-        this.ID = ID;
-        this.processingTime = processingTime;
-        this.dueDate = dueDate;
-        this.releaseDate = releaseDate;
-        this.completeTime = completeTime;
-    }
-
+    /*I seguenti metodi servono per accedere e per modificare gli attributi sopracitati per un job*/
     public int getID() {
         return ID;
     }

@@ -43,7 +43,7 @@ public class TardyJobs {
             if (compute_schedule(sorted_mov_list,um_list)){
                 //controlla se la schedule trovata è ammissibile
                 lateJobs = tardy_jobs.size();
-                if (max_size_tardy >= lateJobs){
+                if (max_size_tardy == lateJobs){
                     //ho trovato una schedula ammissibile
                     long endTime = System.currentTimeMillis();
                     System.out.println("********** printing schedule **********");
