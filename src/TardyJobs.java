@@ -243,7 +243,6 @@ public class TardyJobs {
         for ( Job job : list){
             System.out.println("ID: "+job.getID() + " PROCESSING TIME: "+ job.getProcessingTime()+ " DUE DATE: "+ job.getDueDate()
                     +" RELEASE DATE: "+job.getReleaseDate()
-                    +" COMPLETE TIME: "+job.getCompleteTime()
                     +" COUNTER: "+job.getCounter());
         }
     }
